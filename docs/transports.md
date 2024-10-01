@@ -425,6 +425,8 @@ PRs to this document are welcome for any new transports!
 + [pino-discord-webhook](#pino-discord-webhook)
 + [pino-logfmt](#pino-logfmt)
 + [pino-telegram-webhook](#pino-telegram-webhook)
++ [pino-yc-transport](#pino-yc-transport)
++ [@macfja/pino-fingers-crossed](#macfja-pino-fingers-crossed)
 
 ### Legacy
 
@@ -1090,6 +1092,56 @@ logger.error('<b>test log!</b>');
 ```
 
 The `extra` parameter is optional. Parameters that the method [`sendMessage`](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it.
+
+<a id="pino-yc-transport"></a>
+### pino-yc-transport
+
+[pino-yc-transport](https://github.com/Jhon-Mosk/pino-yc-transport) is a Pino v7+ transport for writing to [Yandex Cloud Logging](https://yandex.cloud/ru/services/logging) from serveless functions or containers.
+
+```js
+const pino = require("pino");
+
+const config = {
+  level: "debug",
+  transport: {
+    target: "pino-yc-transport",
+  },
+};
+
+const logger = pino(config);
+
+logger.debug("some message")
+logger.debug({ foo: "bar" });
+logger.debug("some message %o, %s", { foo: "bar" }, "baz");
+logger.info("info");
+logger.warn("warn");
+logger.error("error");
+logger.error(new Error("error"));
+logger.fatal("fatal");
+```
+
+<a id="macfja-pino-fingers-crossed"></a>
+### @macfja/pino-fingers-crossed
+
+[@macfja/pino-fingers-crossed](https://github.com/MacFJA/js-pino-fingers-crossed) is a Pino v7+ transport that holds logs until a log level is reached, allowing to only have logs when it matters.
+
+```js
+const pino = require('pino');
+const { default: fingersCrossed, enable } = require('@macfja/pino-fingers-crossed')
+
+const logger = pino(fingersCrossed());
+
+logger.info('Will appear immedialty')
+logger.error('Will appear immedialty')
+
+logger.setBindings({ [enable]: 50 })
+logger.info('Will NOT appear immedialty')
+logger.info('Will NOT appear immedialty')
+logger.error('Will appear immedialty as well as the 2 previous messages') // error log are level 50
+logger.info('Will NOT appear')
+logger.info({ [enable]: false }, 'Will appear immedialty')
+logger.info('Will NOT appear')
+```
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
